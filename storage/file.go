@@ -35,11 +35,26 @@ type LocalFileStorageBroker struct {
 	folder   string
 }
 
+func Exists(path string) bool {
+	_, err := os.Stat(path) //os.Stat获取文件信息
+	if err != nil {
+		return os.IsExist(err)
+	}
+	return true
+}
+
 func NewLocalFileStorageBroker(folder string, fileName string) (*LocalFileStorageBroker, error) {
 
 	var f *os.File
 
 	{
+		if !Exists(folder) {
+			os.Mkdir(folder, os.ModePerm)
+		}
+	}
+
+	{
+
 		var err error
 		if fileName != "" {
 			f, err = os.OpenFile(filepath.Join(folder, fileName), os.O_CREATE|os.O_RDWR, os.ModePerm)
